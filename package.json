@@ -1,0 +1,19 @@
+{
+  "name": "trading-bot-pro",
+  "version": "1.0.0",
+  "description": "Base profesional para un bot de trading orientado a mercados de prediccion, con `paper trading` por defecto, control de riesgo y backtesting.",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "playwright": "^1.59.1"
+  }
+}

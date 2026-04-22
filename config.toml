@@ -1,0 +1,206 @@
+[bot]
+mode = "paper"
+starting_cash = 10000.0
+max_open_positions = 5
+max_position_notional = 500.0
+max_total_exposure = 2000.0
+max_daily_loss = 300.0
+min_edge = 0.04
+cooldown_minutes = 30
+
+[strategy]
+name = "event_value"
+default_confidence = 0.55
+price_improvement_bps = 25
+imbalance_weight = 0.06
+imbalance_feature_weight = 0.10
+imbalance_target = 0.12
+min_confidence = 0.60
+real_min_confidence = 0.56
+max_spread = 0.35
+liquidity_target = 250000.0
+depth_target = 5000.0
+extreme_price_cutoff = 0.90
+edge_weight = 0.40
+liquidity_weight = 0.12
+spread_weight = 0.20
+extreme_weight = 0.06
+depth_weight = 0.12
+real_min_edge_multiplier = 0.70
+min_edge_floor = 0.02
+
+[data]
+source = "mock"
+market_limit = 5
+min_volume_24h = 0.0
+request_timeout_seconds = 20
+
+[spot]
+venue = "alpaca"
+
+[paper]
+fee_bps = 10
+slippage_bps = 15
+persist_portfolio = true
+portfolio_state_dir = "var/portfolio"
+
+[storage]
+backend = "sqlite"
+sqlite_path = "var/trading_bot.db"
+
+[polymarket]
+host = "https://clob.polymarket.com"
+chain_id = 137
+enable_live_trading = false
+gamma_host = "https://gamma-api.polymarket.com"
+
+[btc_strategy]
+name = "btcusd_microstructure"
+min_edge_bps = 6.0
+min_confidence = 0.58
+max_spread_bps = 3.0
+depth_target_usd = 250000.0
+imbalance_target = 0.18
+microprice_weight = 0.55
+mid_weight = 0.20
+vwap_weight = 0.15
+last_trade_weight = 0.10
+momentum_weight = 0.20
+confidence_edge_bps = 18.0
+confidence_depth_weight = 0.16
+confidence_imbalance_weight = 0.14
+confidence_spread_weight = 0.12
+
+[mt5]
+symbol = "XAUUSD"
+timeframe = "M1"
+bars = 400
+order_size_lots = 0.01
+deviation_points = 20
+magic = 20260421
+comment = "trading-bot-xau-demo"
+enable_demo_trading = true
+require_demo_account = true
+terminal_path_env = "MT5_TERMINAL_PATH"
+login_env = "MT5_LOGIN"
+password_env = "MT5_PASSWORD"
+server_env = "MT5_SERVER"
+fill_type = "IOC"
+
+[mt5_strategy]
+name = "mt5_xau_scalp"
+fast_period = 20
+slow_period = 50
+pullback_period = 9
+atr_period = 14
+rsi_period = 2
+rsi_threshold = 38.0
+take_profit_atr = 0.53
+stop_loss_atr = 1.7
+entry_timeframe = "M1"
+filter_timeframe = "M5"
+session_start_utc = 14
+session_end_utc = 17
+session_windows_utc = ["Londres|07:00-09:30", "Fixing AM|09:25-09:40", "Solape NY|12:20-15:30"]
+min_atr_points = 10.0
+min_ma_gap_points = 16.0
+max_spread_points = 30.0
+min_confidence = 0.60
+confidence_gap_points = 30.0
+confidence_atr_weight = 0.18
+confidence_spread_weight = 0.14
+core_reclaim_points = 10.0
+trading_mode = "mixed"
+opportunistic_min_confidence = 0.78
+opportunistic_min_atr_points = 16.0
+opportunistic_min_ma_gap_points = 24.0
+opportunistic_max_spread_points = 20.0
+opportunistic_rsi_threshold = 24.0
+opportunistic_take_profit_atr = 0.45
+opportunistic_stop_loss_atr = 1.6
+opportunistic_reclaim_points = 8.0
+opportunistic_max_layers_per_side = 1
+
+[mt5_layers]
+enabled = true
+base_size_lots = 0.01
+max_long_layers = 4
+max_short_layers = 4
+min_minutes_between_layers = 0
+min_price_distance_atr = 0.10
+size_multiplier = 1.00
+max_total_volume = 0.05
+break_even_after_layers = 2
+break_even_buffer_atr = 0.08
+harmonize_take_profit = true
+close_opposite_on_signal = true
+
+[kraken]
+public_rest_url = "https://api.kraken.com"
+private_rest_url = "https://api.kraken.com"
+pair = "XBTUSD"
+wsname = "XBT/USD"
+book_levels = 10
+enable_live_trading = false
+
+[kraken_live]
+enabled = false
+dry_run = true
+api_key_env = "KRAKEN_API_KEY"
+api_secret_env = "KRAKEN_API_SECRET"
+validate_orders = true
+dead_man_timeout_seconds = 60
+auto_arm_dead_man_switch = true
+skip_if_open_orders = true
+cancel_existing_before_submit = false
+
+[alpaca]
+data_url = "https://data.alpaca.markets"
+paper_trading_url = "https://paper-api.alpaca.markets"
+live_trading_url = "https://api.alpaca.markets"
+symbol = "BTC/USD"
+legacy_symbol = "BTCUSD"
+crypto_location = "us"
+enable_live_trading = false
+
+[alpaca_paper]
+enabled = true
+api_key_env = "APCA_API_KEY_ID"
+api_secret_env = "APCA_API_SECRET_KEY"
+cancel_existing_before_submit = false
+skip_if_open_orders = true
+close_positions_on_reset = true
+
+[vercel]
+auto_publish_dashboard = true
+scope = "kingkykaz-gmailcoms-projects"
+dashboard_output = "index.html"
+production = true
+publish_on_activity_only = true
+min_publish_interval_minutes = 180
+
+[alerts]
+enabled = true
+open_dashboard_on_alert = true
+sound_on_alert = true
+min_signals = 1
+min_fills = 1
+
+[live]
+enabled = false
+dry_run = true
+signature_type = 0
+private_key_env = "POLY_PRIVATE_KEY"
+api_key_env = "POLY_API_KEY"
+api_secret_env = "POLY_API_SECRET"
+api_passphrase_env = "POLY_API_PASSPHRASE"
+funder_env = "POLY_FUNDER_ADDRESS"
+kill_switch_path = "var/kill_switch.flag"
+
+[readiness]
+lookback_runs = 50
+min_real_runs = 12
+min_real_fills = 10
+min_positive_run_rate = 0.55
+max_run_drawdown = 250.0
+max_zero_fill_streak = 5

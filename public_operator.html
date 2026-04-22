@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cabina Publica del Bot</title>
+  <style>
+    :root {
+      --bg: #03060b; --bg-soft: #071018; --surface: rgba(7,16,24,.94); --line: rgba(128,165,193,.14);
+      --text: #edf4fb; --muted: #88a2b8; --muted-2: #6b8397; --cyan: #38d9ff; --green: #37d67a;
+      --amber: #ffb547; --red: #ff6b6b; --shadow: 0 22px 80px rgba(0,0,0,.48);
+      --mono: "Cascadia Mono", "IBM Plex Mono", "Consolas", monospace; --sans: "Bahnschrift", "Segoe UI Variable Text", "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; } html { color-scheme: dark; }
+    body { margin: 0; min-height: 100vh; color: var(--text); font-family: var(--sans); background: radial-gradient(circle at 12% 8%, rgba(56,217,255,.11), transparent 22%), radial-gradient(circle at 86% 9%, rgba(255,181,71,.08), transparent 18%), linear-gradient(180deg, #020408 0%, #07111a 38%, #04080d 100%); }
+    .shell { width: min(1680px, calc(100% - 18px)); margin: 10px auto 18px; display: grid; gap: 12px; }
+    .topbar, .panel { border: 1px solid var(--line); background: linear-gradient(180deg, rgba(8,16,24,.98), rgba(4,9,14,.96)); box-shadow: var(--shadow); backdrop-filter: blur(14px); }
+    .topbar { border-radius: 24px; padding: 18px 18px 16px; display: grid; gap: 14px; }
+    .topline { display: flex; justify-content: space-between; gap: 18px; align-items: flex-start; flex-wrap: wrap; }
+    .kicker { font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--cyan); margin-bottom: 8px; }
+    h1 { margin: 0; font-size: clamp(24px, 3.6vw, 40px); letter-spacing: -.05em; line-height: .95; }
+    .lede { margin: 8px 0 0; max-width: 760px; color: var(--muted); line-height: 1.45; font-size: 14px; }
+    .market-strip, .chip-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .market-strip { align-items: center; justify-content: flex-end; }
+    .tag, .chip, .panel-pill { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: 999px; padding: 7px 11px; color: var(--muted); background: rgba(255,255,255,.02); font-size: 11px; text-transform: uppercase; letter-spacing: .14em; }
+    .tag strong, .chip strong, .panel-pill strong { color: var(--text); text-transform: none; letter-spacing: 0; font-weight: 700; }
+    .panel-pill.alert { border-color: rgba(255,181,71,.34); color: var(--amber); background: rgba(255,181,71,.08); }
+    .panel-pill.live { border-color: rgba(56,217,255,.24); color: var(--cyan); background: rgba(56,217,255,.08); }
+    .status-ribbon { display: grid; gap: 10px; grid-template-columns: 1.35fr repeat(4, minmax(0,1fr)); }
+    .ribbon-main, .ribbon-box, .card, .row-card, .empty-state, .desk-note { border: 1px solid var(--line); border-radius: 16px; background: linear-gradient(180deg, rgba(10,22,33,.98), rgba(6,12,18,.96)); }
+    .ribbon-main, .ribbon-box, .card, .empty-state, .desk-note { padding: 14px; }
+    .ribbon-main { display: grid; gap: 10px; } .ribbon-main h2, .panel-head h2, .control-label, .field label, .tape-col h3 { margin: 0; font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted-2); }
+    .ribbon-main p, .panel-head p, .subtle { margin: 0; color: var(--muted); line-height: 1.45; font-size: 13px; }
+    .mini-grid, .stats-bar, .candidate-grid, .actions, .tape-grid { display: grid; gap: 10px; }
+    .mini-grid { grid-template-columns: repeat(3, minmax(0,1fr)); } .mini-cell { border-top: 1px solid var(--line); padding-top: 10px; } .mini-cell span, .ribbon-label, .metric-cell span, .stats-bar .card span { display: block; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted-2); }
+    .mini-cell strong, .ribbon-value, .stats-bar .card strong { display: block; margin-top: 6px; font-size: 18px; letter-spacing: -.04em; } .ribbon-value { font-size: 28px; } .stats-bar .card strong { font-size: 25px; }
+    .tone-cyan { color: var(--cyan); } .tone-green { color: var(--green); } .tone-amber { color: var(--amber); } .tone-red { color: var(--red); }
+    .desk { display: grid; gap: 12px; grid-template-columns: minmax(300px,340px) minmax(560px,1fr) minmax(320px,380px); align-items: start; } .rail, .panel-body, .control-group, .fields, .list, .tape-col, .candidate { display: grid; gap: 12px; }
+    .panel { border-radius: 20px; overflow: hidden; } .panel-head { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; padding: 14px 16px 12px; border-bottom: 1px solid var(--line); background: linear-gradient(180deg, rgba(13,26,39,.9), rgba(8,17,26,.32)); } .panel-head p { margin-top: 6px; }
+    .desk-note strong { font-size: 13px; text-transform: uppercase; letter-spacing: .14em; color: var(--muted-2); } .desk-note .value { font-size: 15px; color: var(--text); } .code-path, .row-mono { font-family: var(--mono); font-size: 11px; color: var(--muted-2); word-break: break-all; }
+    input { width: 100%; border: 1px solid var(--line); border-radius: 14px; padding: 12px 13px; background: rgba(4,10,16,.88); color: var(--text); font-family: var(--mono); } input:focus { outline: none; border-color: rgba(56,217,255,.52); box-shadow: 0 0 0 3px rgba(56,217,255,.08); }
+    form { margin: 0; } .actions { grid-template-columns: repeat(2, minmax(0,1fr)); } .actions.stack { grid-template-columns: 1fr; }
+    button { width: 100%; min-height: 46px; border-radius: 14px; border: 1px solid rgba(56,217,255,.18); background: linear-gradient(180deg, rgba(13,27,40,.98), rgba(8,16,24,.94)); color: var(--text); font-family: var(--sans); font-size: 13px; font-weight: 700; cursor: pointer; transition: transform .16s ease, border-color .16s ease, box-shadow .16s ease; }
+    button:hover { transform: translateY(-1px); border-color: rgba(56,217,255,.52); box-shadow: 0 8px 20px rgba(0,0,0,.24); }
+    button.danger { border-color: rgba(255,107,107,.26); background: linear-gradient(180deg, rgba(55,18,20,.95), rgba(21,8,10,.94)); }
+    button.danger:hover { border-color: rgba(255,107,107,.56); }
+    button.success { border-color: rgba(55,214,122,.28); background: linear-gradient(180deg, rgba(15,49,31,.98), rgba(8,24,14,.94)); }
+    button.success:hover { border-color: rgba(55,214,122,.58); }
+    button.warning { border-color: rgba(255,181,71,.28); background: linear-gradient(180deg, rgba(54,33,10,.98), rgba(28,16,6,.94)); }
+    button.warning:hover { border-color: rgba(255,181,71,.58); }
+    button.ghost { border-color: rgba(128,165,193,.18); background: linear-gradient(180deg, rgba(10,18,26,.98), rgba(6,10,16,.94)); }
+    button.wide { min-height: 54px; font-size: 14px; }
+    .console { padding: 0; overflow: hidden; } .console-bar { display: flex; align-items: center; gap: 8px; padding: 12px 14px; border-bottom: 1px solid var(--line); background: rgba(255,255,255,.02); }
+    .dot { width: 9px; height: 9px; border-radius: 999px; display: inline-block; } .dot.red { background: var(--red); } .dot.amber { background: var(--amber); } .dot.green { background: var(--green); }
+    pre { margin: 0; padding: 14px; min-height: 220px; max-height: 420px; overflow: auto; white-space: pre-wrap; word-break: break-word; font-family: var(--mono); font-size: 12px; line-height: 1.55; color: #d6e4f0; }
+    .candidate-hero, .row-top { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; flex-wrap: wrap; } .candidate-hero { padding-bottom: 14px; border-bottom: 1px solid var(--line); }
+    .candidate-hero h3 { margin: 0; font-size: 34px; letter-spacing: -.05em; line-height: .92; } .candidate-hero p { margin: 8px 0 0; color: var(--muted); max-width: 540px; font-size: 14px; line-height: 1.45; }
+    .side-pill { display: inline-flex; align-items: center; gap: 8px; padding: 9px 14px; border-radius: 999px; border: 1px solid var(--line); background: rgba(255,255,255,.02); font-size: 11px; text-transform: uppercase; letter-spacing: .16em; }
+    .side-pill.buy { color: var(--green); border-color: rgba(55,214,122,.28); background: rgba(55,214,122,.08); } .side-pill.sell { color: var(--red); border-color: rgba(255,107,107,.28); background: rgba(255,107,107,.08); }
+    .candidate-grid { grid-template-columns: repeat(4, minmax(0,1fr)); } .metric-cell { border: 1px solid var(--line); border-radius: 14px; padding: 12px; background: rgba(255,255,255,.02); } .metric-cell strong { display: block; margin-top: 6px; font-size: 18px; letter-spacing: -.04em; }
+    .trend-stack { display: grid; gap: 12px; }
+    .trend-stats { display: grid; gap: 10px; grid-template-columns: repeat(4, minmax(0,1fr)); }
+    .trend-stat, .chart-card, .flow-card { border: 1px solid var(--line); border-radius: 16px; background: linear-gradient(180deg, rgba(10,22,33,.98), rgba(6,12,18,.96)); }
+    .trend-stat { padding: 12px 14px; }
+    .trend-stat span { display: block; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted-2); }
+    .trend-stat strong { display: block; margin-top: 8px; font-size: 22px; letter-spacing: -.04em; }
+    .trend-grid { display: grid; gap: 12px; grid-template-columns: repeat(3, minmax(0,1fr)); }
+    .chart-card { padding: 14px; display: grid; gap: 12px; }
+    .chart-head { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; }
+    .chart-head h3 { margin: 0; font-size: 15px; letter-spacing: -.03em; }
+    .chart-head p { margin: 5px 0 0; font-size: 12px; color: var(--muted); line-height: 1.45; max-width: 240px; }
+    .chart-wrap { display: grid; gap: 10px; }
+    .chart-svg { width: 100%; height: auto; display: block; border-radius: 14px; background: rgba(255,255,255,.015); }
+    .axis-line { stroke: rgba(128,165,193,.18); stroke-width: 1; }
+    .trend-line { fill: none; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+    .area-fill { fill: rgba(56,217,255,.12); }
+    .chart-node { opacity: .92; }
+    .chart-node-last { filter: drop-shadow(0 0 8px rgba(56,217,255,.35)); }
+    .chart-foot, .chart-legend, .flow-head { display: flex; justify-content: space-between; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .chart-foot span, .chart-legend span { color: var(--muted); font-size: 12px; }
+    .chart-foot strong { font-size: 16px; letter-spacing: -.03em; }
+    .bar-primary { fill: rgba(56,217,255,.68); }
+    .bar-secondary { fill: rgba(55,214,122,.78); }
+    .flow-card { padding: 12px; display: grid; gap: 10px; }
+    .side-tag { display: inline-flex; align-items: center; gap: 8px; border-radius: 999px; padding: 7px 10px; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; border: 1px solid var(--line); }
+    .side-tag.buy { color: var(--green); border-color: rgba(55,214,122,.28); background: rgba(55,214,122,.08); }
+    .side-tag.sell { color: var(--red); border-color: rgba(255,107,107,.28); background: rgba(255,107,107,.08); }
+    .split-bar { height: 14px; width: 100%; border-radius: 999px; overflow: hidden; background: rgba(255,255,255,.04); display: flex; }
+    .split-buy { background: linear-gradient(90deg, rgba(55,214,122,.82), rgba(55,214,122,.52)); }
+    .split-sell { background: linear-gradient(90deg, rgba(255,107,107,.52), rgba(255,107,107,.82)); }
+    .row-card { padding: 12px 14px; display: grid; gap: 8px; } .row-title { font-size: 15px; letter-spacing: -.03em; font-weight: 700; color: var(--text); } .meta { display: flex; flex-wrap: wrap; gap: 8px 14px; color: var(--muted); font-size: 12px; } .meta strong { color: var(--text); } .empty-state { color: var(--muted); line-height: 1.45; }
+    .tape-grid { grid-template-columns: repeat(2, minmax(0,1fr)); } .market-strip, .chip-row { align-items: center; }
+    @media (max-width: 1360px) { .desk { grid-template-columns: 300px 1fr; } .right-rail { grid-column: 1 / -1; display: grid; gap: 12px; grid-template-columns: repeat(3, minmax(0,1fr)); } .trend-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 1120px) { .status-ribbon { grid-template-columns: 1fr 1fr; } .ribbon-main { grid-column: 1 / -1; } .desk, .right-rail { grid-template-columns: 1fr; } .candidate-grid, .tape-grid, .trend-stats { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 760px) { .shell { width: min(100% - 12px, 1680px); } .status-ribbon, .candidate-grid, .stats-bar, .tape-grid, .mini-grid, .actions, .trend-stats { grid-template-columns: 1fr; } .market-strip { justify-content: flex-start; } }
+    
+.public-banner {
+  border: 1px solid rgba(255, 181, 71, 0.28);
+  border-radius: 18px;
+  padding: 14px 16px;
+  background: linear-gradient(180deg, rgba(46, 27, 7, 0.85), rgba(22, 13, 4, 0.92));
+  color: #ffd48f;
+  display: grid;
+  gap: 6px;
+}
+.public-banner strong {
+  font-size: 11px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+.public-banner span {
+  font-size: 14px;
+  line-height: 1.45;
+}
+.readonly-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgba(255, 181, 71, 0.30);
+  border-radius: 999px;
+  padding: 7px 10px;
+  color: #ffd48f;
+  background: rgba(255, 181, 71, 0.08);
+  font-size: 11px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+.readonly-note {
+  border: 1px dashed rgba(255, 181, 71, 0.22);
+  border-radius: 14px;
+  padding: 12px 14px;
+  color: #d6dce4;
+  background: rgba(255, 255, 255, 0.02);
+  font-size: 13px;
+  line-height: 1.45;
+}
+form[data-readonly="true"] {
+  pointer-events: none;
+}
+button[disabled] {
+  opacity: 0.48;
+  filter: saturate(0.7);
+  cursor: not-allowed;
+}
+
+  </style>
+</head>
+<body>
+  <main class="shell"><section class="public-banner"><strong>Modo publico</strong><span>Vista publicada en Vercel. Esta cabina es solo lectura: los mandos reales, credenciales y ejecucion siguen estando en la mesa local.</span></section>
+    <section class="topbar">
+      <div class="topline">
+        <div>
+          <div class="kicker">Cabina de Operador</div>
+          <h1>Mesa de ejecucion local para XAUUSD</h1>
+          <p class="lede">Arriba tienes el semaforo maestro; al centro el ticket, el Radar XAU y la consola; a la derecha las capas demo y el estado del terminal. Todo queda orientado a MT5 y oro.</p>
+        </div>
+        <div class="market-strip">
+          <span class="tag">Par <strong>XAUUSD</strong></span>
+          <span class="tag">Venue <strong>MT5 Demo</strong></span>
+          <span class="tag">API <strong>OK</strong></span>
+        </div>
+      </div>
+      <section class="status-ribbon">
+        <article class="ribbon-main">
+          <h2>Semaforo maestro</h2>
+          <p>El sistema corre, guarda y publica bien, pero el edge todavia no esta demostrado.</p>
+          <div class="mini-grid">
+            <div class="mini-cell"><span>Operativa</span><strong class="tone-green">LISTO</strong></div>
+            <div class="mini-cell"><span>Edge</span><strong class="tone-red">FALLA</strong></div>
+            <div class="mini-cell"><span>Live</span><strong class="tone-red">BLOQUEADO</strong></div>
+          </div>
+        </article>
+        <article class="ribbon-box"><div class="ribbon-label">Readiness</div><div class="ribbon-value tone-cyan">PAPER OPERATIVO</div><div class="subtle">Dictamen general.</div></article>
+        <article class="ribbon-box"><div class="ribbon-label">Modo live</div><div class="ribbon-value tone-green">DEMO_ON</div><div class="subtle">Seguro principal.</div></article>
+        <article class="ribbon-box"><div class="ribbon-label">Kill switch</div><div class="ribbon-value tone-green">INACTIVO</div><div class="subtle">Freno duro del executor.</div></article>
+        <article class="ribbon-box"><div class="ribbon-label">Auth MT5</div><div class="ribbon-value tone-green">AUTH_OK</div><div class="subtle">Estado de credenciales.</div></article>
+      </section>
+    </section>
+
+    <section class="desk">
+      <aside class="rail left-rail">
+        <section class="panel">
+          <div class="panel-head">
+            <div><h2>Puente MT5</h2><p>Estado del terminal, credenciales locales y seguro de ejecucion demo.</p></div><span class="readonly-pill">solo lectura</span>
+            <span class="panel-pill live">estado<strong>demo</strong></span>
+          </div>
+          <div class="panel-body"><div class="readonly-note">Los botones de esta version web son informativos. Para ejecutar acciones reales o de paper, usa la cabina local en tu equipo.</div>
+            <div class="desk-note">
+              <strong>Stack</strong>
+              <div class="value">Demo trading SI - Fuente MT5</div>
+              <div class="code-path">C:\machine-root\Workspace\trading-bot-pro\.env.mt5.local</div>
+            </div>
+            <div class="desk-note"><strong>Terminal</strong><div class="subtle">Login 1061...5005</div><div class="subtle">Server Meta...Demo</div></div>
+            <div class="desk-note">
+              <strong>Puente</strong>
+              <div class="subtle">El terminal demo vive en local. Si cambias de cuenta, actualiza .env.mt5.local o usa el puente MT5 para abrir instalacion y ayuda.</div>
+            </div>
+            
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <div><h2>Mandos</h2><p>Organizados por ciclo, cuenta, riesgo y fuego real.</p></div><span class="readonly-pill">solo lectura</span>
+          </div>
+          <div class="panel-body"><div class="readonly-note">Los botones de esta version web son informativos. Para ejecutar acciones reales o de paper, usa la cabina local en tu equipo.</div>
+            <div class="control-group"><div class="control-label">Puente</div><div class="actions"><form method="post" action="/action" data-readonly="true"><input type="hidden" name="action" value="mt5_connect"><button disabled aria-disabled="true" class="" type="submit">Abrir Puente MT5</button></form><form method="post" action="/action" data-readonly="true"><input type="hidden" name="action" value="live_check"><button disabled aria-disabled="true" class="" type="submit">Revisar MT5</button></form></div></div>
+            <div class="control-group"><div class="control-label">Ciclo</div><div class="actions"><form method="post" action="/action" data-readonly="true"><input type="hidden" name="action" value="run_once_paper"><button disabled aria-disabled="true" class="ghost wide" type="submit">Revisar Setup</button></form><form method="post" action="/action" data-readonly="true"><input type="hidden" name="action" value="preview"><button disabled aria-disabled="true" class="warning wide" type="submit">Ver Orden Candidata</button></form><form method="post" action="/action" data-readonly="true"><input type="hidden" name="action" value="validate"><button disabled aria-disabled="true" class="ghost" type="submit">Validar Orden</button></form><form method="post" action="/action" data-readonly="true"><input type="hidden" name="action" value="live_check"><button disabled aria-disabled="true" class="ghost" type="submit">Estado del Terminal</button></form></div></div><div class="control-group"><div class="control-label">Mesa</div><div class="actions"><form method="post" action="/action" data-readonly="true"><input type="hidden" name="action" value="portfolio_show"><button disabled aria-disabled="true" class="ghost" type="submit">Posiciones Abiertas</button></form><form method="post" action="/action" data-readonly="true"><input type="hidden" name="action" value="mt5_status"><button disabled aria-disabled="true" class="ghost" type="submit">Radar XAU</button></form><form method="post" action="/action" data-readonly="true"><input type="hidden" name="action" value="submit_validate"><button disabled aria-disabled="true" class="warning" type="submit">Validar Envio</button></form><form method="post" action="/action" data-readonly="true"><input type="hidden" name="action" value="force_buy"><button disabled aria-disabled="true" class="success wide" type="submit">Comprar Demo Ahora</button></form><form method="post" action="/action" data-readonly="true"><input type="hidden" name="action" value="force_sell"><button disabled aria-disabled="true" class="danger wide" type="submit">Vender Demo Ahora</button></form></div></div><div class="control-group"><div class="control-label">Riesgo</div><div class="actions"><form method="post" action="/action" data-readonly="true"><input type="hidden" name="action" value="kill_on"><button disabled aria-disabled="true" class="danger wide" type="submit">Kill Switch ON</button></form><form method="post" action="/action" data-readonly="true"><input type="hidden" name="action" value="kill_off"><button disabled aria-disabled="true" class="ghost wide" type="submit">Kill Switch OFF</button></form></div></div><div class="control-group"><div class="control-label">Demo</div><div class="actions"><form method="post" action="/action" data-readonly="true"><input type="hidden" name="action" value="submit_live"><button disabled aria-disabled="true" class="danger wide" type="submit">Enviar Orden Demo</button></form><form method="post" action="/action" data-readonly="true"><input type="hidden" name="action" value="run_once_live"><button disabled aria-disabled="true" class="success wide" type="submit">Ejecutar Ciclo Demo</button></form></div></div>
+          </div>
+        </section>
+      </aside>
+
+      <section class="rail center-rail">
+        <section class="panel">
+          <div class="panel-head">
+            <div><h2>Pulso y Tendencias</h2><p>Lectura rapida del comportamiento reciente con curvas, actividad y sesgo.</p></div>
+            <span class="panel-pill alert">setup<strong>quieto</strong></span>
+          </div>
+          <div class="panel-body"><section class="trend-stack"><div class="trend-stats"><article class="trend-stat"><span>Runs verdes</span><strong>0/18</strong></article><article class="trend-stat"><span>PnL medio/run</span><strong>0.00</strong></article><article class="trend-stat"><span>Signals/run</span><strong>0.0</strong></article><article class="trend-stat"><span>Live vs benchmark</span><strong>bench 77.8%</strong></article></div><div class="trend-grid"><article class="chart-card"><div class="chart-head"><div><h3>Curva de PnL</h3><p>Evolucion acumulada de las ultimas corridas del motor.</p></div><span class="chip">runs <strong>18</strong></span></div><div class="chart-wrap"><svg viewBox="0 0 560 160" class="chart-svg" preserveAspectRatio="none"><line x1="14" y1="138" x2="546" y2="138" class="axis-line" /><line x1="14" y1="14" x2="14" y2="138" class="axis-line" /><polygon points="14.00,138.00 14.00,76.00 45.29,76.00 76.59,76.00 107.88,76.00 139.18,76.00 170.47,76.00 201.76,76.00 233.06,76.00 264.35,76.00 295.65,76.00 326.94,76.00 358.24,76.00 389.53,76.00 420.82,76.00 452.12,76.00 483.41,76.00 514.71,76.00 546.00,76.00 546.00,138.00" class="area-fill"></polygon><polyline points="14.00,76.00 45.29,76.00 76.59,76.00 107.88,76.00 139.18,76.00 170.47,76.00 201.76,76.00 233.06,76.00 264.35,76.00 295.65,76.00 326.94,76.00 358.24,76.00 389.53,76.00 420.82,76.00 452.12,76.00 483.41,76.00 514.71,76.00 546.00,76.00" class="trend-line" style="stroke:var(--cyan)"></polyline><circle cx="14.00" cy="76.00" r="3.8" class="chart-node" style="fill:var(--cyan)"></circle><circle cx="546.00" cy="76.00" r="4.4" class="chart-node chart-node-last" style="fill:var(--cyan)"></circle></svg><div class="chart-foot"><span>#230</span><strong>0.00</strong><span>#247</span></div></div></article><article class="chart-card"><div class="chart-head"><div><h3>Actividad</h3><p>Signals y fills por corrida para ver ritmo y conversion.</p></div><span class="chip">fills <strong>0</strong></span></div><div class="chart-wrap"><svg viewBox="0 0 560 160" class="chart-svg" preserveAspectRatio="none"><line x1="14" y1="132" x2="546" y2="132" class="axis-line" /><rect x="14.00" y="132.00" width="11.78" height="0.00" class="bar-primary"></rect><rect x="31.78" y="132.00" width="11.78" height="0.00" class="bar-secondary"></rect><rect x="43.56" y="132.00" width="11.78" height="0.00" class="bar-primary"></rect><rect x="61.33" y="132.00" width="11.78" height="0.00" class="bar-secondary"></rect><rect x="73.11" y="132.00" width="11.78" height="0.00" class="bar-primary"></rect><rect x="90.89" y="132.00" width="11.78" height="0.00" class="bar-secondary"></rect><rect x="102.67" y="132.00" width="11.78" height="0.00" class="bar-primary"></rect><rect x="120.44" y="132.00" width="11.78" height="0.00" class="bar-secondary"></rect><rect x="132.22" y="132.00" width="11.78" height="0.00" class="bar-primary"></rect><rect x="150.00" y="132.00" width="11.78" height="0.00" class="bar-secondary"></rect><rect x="161.78" y="132.00" width="11.78" height="0.00" class="bar-primary"></rect><rect x="179.56" y="132.00" width="11.78" height="0.00" class="bar-secondary"></rect><rect x="191.33" y="132.00" width="11.78" height="0.00" class="bar-primary"></rect><rect x="209.11" y="132.00" width="11.78" height="0.00" class="bar-secondary"></rect><rect x="220.89" y="132.00" width="11.78" height="0.00" class="bar-primary"></rect><rect x="238.67" y="132.00" width="11.78" height="0.00" class="bar-secondary"></rect><rect x="250.44" y="132.00" width="11.78" height="0.00" class="bar-primary"></rect><rect x="268.22" y="132.00" width="11.78" height="0.00" class="bar-secondary"></rect><rect x="280.00" y="132.00" width="11.78" height="0.00" class="bar-primary"></rect><rect x="297.78" y="132.00" width="11.78" height="0.00" class="bar-secondary"></rect><rect x="309.56" y="132.00" width="11.78" height="0.00" class="bar-primary"></rect><rect x="327.33" y="132.00" width="11.78" height="0.00" class="bar-secondary"></rect><rect x="339.11" y="132.00" width="11.78" height="0.00" class="bar-primary"></rect><rect x="356.89" y="132.00" width="11.78" height="0.00" class="bar-secondary"></rect><rect x="368.67" y="132.00" width="11.78" height="0.00" class="bar-primary"></rect><rect x="386.44" y="132.00" width="11.78" height="0.00" class="bar-secondary"></rect><rect x="398.22" y="132.00" width="11.78" height="0.00" class="bar-primary"></rect><rect x="416.00" y="132.00" width="11.78" height="0.00" class="bar-secondary"></rect><rect x="427.78" y="132.00" width="11.78" height="0.00" class="bar-primary"></rect><rect x="445.56" y="132.00" width="11.78" height="0.00" class="bar-secondary"></rect><rect x="457.33" y="132.00" width="11.78" height="0.00" class="bar-primary"></rect><rect x="475.11" y="132.00" width="11.78" height="0.00" class="bar-secondary"></rect><rect x="486.89" y="132.00" width="11.78" height="0.00" class="bar-primary"></rect><rect x="504.67" y="132.00" width="11.78" height="0.00" class="bar-secondary"></rect><rect x="516.44" y="132.00" width="11.78" height="0.00" class="bar-primary"></rect><rect x="534.22" y="132.00" width="11.78" height="0.00" class="bar-secondary"></rect></svg><div class="chart-legend"><span><i class="dot cyan"></i>Signals</span><span><i class="dot green"></i>Fills</span></div></div></article><article class="chart-card"><div class="chart-head"><div><h3>Tape y sesgo</h3><p>Flujo reciente de ejecuciones y balance entre buy y sell.</p></div><span class="chip">buys/sells <strong>0/0</strong></span></div><div class="flow-card"><div class="flow-head"><span class="side-tag buy">Buy 0</span><span class="side-tag sell">Sell 0</span></div><div class="split-bar"><div class="split-buy" style="width:0.00%"></div><div class="split-sell" style="width:100.00%"></div></div></div><div class="empty-state">Todavia no hay suficientes puntos para pintar tendencia real.</div></article></div></section></div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <div><h2>Ticket de Operacion</h2><p>Lo que el motor quiere mandar ahora mismo.</p></div>
+            <span class="panel-pill">par<strong>XAUUSD</strong></span>
+          </div>
+          <div class="panel-body"><div class="empty-state">No hay orden candidata ahora mismo. El motor no ve una entrada limpia o el filtro de riesgo la esta rechazando antes de llegar al ticket.</div></div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <div><h2>Radar XAU</h2><p>Ventana operativa, setup actual, capas abiertas y benchmark activo.</p></div>
+            <span class="panel-pill live">sesion<strong>ACTIVA</strong></span>
+          </div>
+          <div class="panel-body"><article class="candidate-card"><div class="candidate-head"><div><div class="row-mono">xauusd scalping</div><div class="row-title">Estado tactico del oro</div></div><div class="chip-row"><span class="chip">ventana <strong>01:00-03:30, 03:25-03:40, 06:20-09:30</strong></span><span class="chip">proximo <strong>Londres cierra 03:30</strong></span></div></div><div class="candidate-grid"><div class="card"><span>Setup</span><strong class="tone-amber">NO</strong></div><div class="card"><span>Capas Buy</span><strong>0</strong></div><div class="card"><span>Capas Sell</span><strong>0</strong></div><div class="card"><span>Win Rate Live</span><strong>s/d</strong></div><div class="card"><span>Trades Live</span><strong>0</strong></div><div class="card"><span>Win Rate Benchmark</span><strong>77.8%</strong></div><div class="card"><span>PF Benchmark</span><strong>1.11</strong></div></div><div class="candidate-reason"><strong>Lectura</strong><span>Sin setup valido en este minuto.</span></div></article></div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <div><h2>Consola</h2><p>Salida textual exacta de la ultima accion disparada.</p></div>
+            <span class="panel-pill alert">ultima<strong>Modo publico</strong></span>
+          </div>
+          <div class="panel-body">
+            <div class="card console">
+              <div class="console-bar"><span class="dot red"></span><span class="dot amber"></span><span class="dot green"></span><span class="row-mono">Modo publico</span></div>
+              <pre>Vista publicada en Vercel. Esta cabina es solo lectura: los mandos reales, credenciales y ejecucion siguen estando en la mesa local.</pre>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <div><h2>Tape Operativo</h2><p>Corridas y fills recientes para leer el pulso del sistema.</p></div>
+          </div>
+          <div class="panel-body">
+            <div class="tape-grid">
+              <section class="tape-col"><h3>Corridas recientes</h3><article class="row-card"><div class="row-top"><div class="row-title">Run #247</div><div class="row-mono">mt5</div></div><div class="meta"><span>mode <strong>live</strong></span><span>signals <strong>0</strong></span><span>fills <strong>0</strong></span><span>pnl <strong>0.00</strong></span></div></article><article class="row-card"><div class="row-top"><div class="row-title">Run #246</div><div class="row-mono">mt5</div></div><div class="meta"><span>mode <strong>live</strong></span><span>signals <strong>0</strong></span><span>fills <strong>0</strong></span><span>pnl <strong>0.00</strong></span></div></article><article class="row-card"><div class="row-top"><div class="row-title">Run #245</div><div class="row-mono">mt5</div></div><div class="meta"><span>mode <strong>live</strong></span><span>signals <strong>0</strong></span><span>fills <strong>0</strong></span><span>pnl <strong>0.00</strong></span></div></article><article class="row-card"><div class="row-top"><div class="row-title">Run #244</div><div class="row-mono">mt5</div></div><div class="meta"><span>mode <strong>live</strong></span><span>signals <strong>0</strong></span><span>fills <strong>0</strong></span><span>pnl <strong>0.00</strong></span></div></article><article class="row-card"><div class="row-top"><div class="row-title">Run #243</div><div class="row-mono">mt5</div></div><div class="meta"><span>mode <strong>live</strong></span><span>signals <strong>0</strong></span><span>fills <strong>0</strong></span><span>pnl <strong>0.00</strong></span></div></article><article class="row-card"><div class="row-top"><div class="row-title">Run #242</div><div class="row-mono">mt5</div></div><div class="meta"><span>mode <strong>live</strong></span><span>signals <strong>0</strong></span><span>fills <strong>0</strong></span><span>pnl <strong>0.00</strong></span></div></article></section>
+              <section class="tape-col"><h3>Fills recientes</h3><div class="empty-state">Sin fills recientes. Aun no hay cinta de ejecucion para leer.</div></section>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <aside class="rail right-rail">
+        <section class="panel">
+          <div class="panel-head">
+            <div><h2>Posiciones MT5</h2><p>Capas y posiciones demo abiertas en XAUUSD.</p></div>
+          </div>
+          <div class="panel-body">
+            <div class="stats-bar">
+              <div class="card"><span>Cash</span><strong>97.76</strong></div>
+              <div class="card"><span>Realized PnL</span><strong class="tone-green">0.00</strong></div>
+              <div class="card"><span>Posiciones</span><strong>0</strong></div>
+            </div>
+            <div class="list"><div class="empty-state">Sin posiciones abiertas. La mesa esta plana y todo el capital sigue en caja.</div></div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <div><h2>Cuenta MT5</h2><p>Balance, equity, margen libre y PnL leidos del terminal demo.</p></div>
+          </div>
+          <div class="panel-body list"><article class="row-card"><div class="row-top"><div class="row-title">balance</div><div class="row-mono">balance</div></div><div class="meta"><span>disponible <strong>97.76000000</strong></span></div></article><article class="row-card"><div class="row-top"><div class="row-title">equity</div><div class="row-mono">balance</div></div><div class="meta"><span>disponible <strong>97.76000000</strong></span></div></article><article class="row-card"><div class="row-top"><div class="row-title">margin_free</div><div class="row-mono">balance</div></div><div class="meta"><span>disponible <strong>97.76000000</strong></span></div></article><article class="row-card"><div class="row-top"><div class="row-title">profit</div><div class="row-mono">balance</div></div><div class="meta"><span>disponible <strong>0.00000000</strong></span></div></article></div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <div><h2>Ordenes MT5</h2><p>Ordenes pendientes vivas en el terminal para no pisarte con otra capa.</p></div>
+          </div>
+          <div class="panel-body list"><div class="empty-state">No hay ordenes abiertas. La mesa esta limpia para este simbolo.</div></div>
+        </section>
+      </aside>
+    </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,12 @@
+.vercel
+.env.kraken.local
+.env.alpaca.local
+.env.mt5.local
+.venv/
+node_modules/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+var/
+download/
