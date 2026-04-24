@@ -293,7 +293,7 @@
           </article>
           <article class="metric">
             <div class="metric-label">PnL ultima corrida</div>
-            <div class="metric-value green">0.11</div>
+            <div class="metric-value red">-0.14</div>
           </article>
           <article class="metric">
             <div class="metric-label">Tasa de acierto</div>
@@ -313,7 +313,7 @@
           </div>
           <div>
             <h2>Bloqueos criticos</h2>
-            <ul class="blockers"><li>Faltan fills reales: 0/10.</li><li>La tasa positiva real esta en 4.0% y el minimo es 55.0%.</li><li>Falta registrar trades cerrados para calcular expectancy neta real.</li></ul>
+            <ul class="blockers"><li>Faltan fills reales: 0/10.</li><li>La tasa positiva real esta en 2.0% y el minimo es 55.0%.</li><li>Falta registrar trades cerrados para calcular expectancy neta real.</li></ul>
           </div>
           <div>
             <h2>Que mirar ahora</h2>
@@ -336,6 +336,32 @@
         <article class="card">
           <div class="card-top">
             <div class="card-title">Setup largo</div>
+            <div class="small">run #5472</div>
+          </div>
+          <div class="card-copy">El modelo ve al mercado cotizando por debajo de su estimacion justa. La confianza es 0.83 y el edge esperado es 581.000.</div>
+          <div class="meta-line">
+            <span>Confianza 0.827</span>
+            <span>Edge 581.000</span>
+            <span class="mono">mt5:XAUUSD</span>
+          </div>
+        </article>
+        
+        <article class="card">
+          <div class="card-top">
+            <div class="card-title">Setup largo</div>
+            <div class="small">run #5469</div>
+          </div>
+          <div class="card-copy">El modelo ve al mercado cotizando por debajo de su estimacion justa. La confianza es 0.83 y el edge esperado es 538.000.</div>
+          <div class="meta-line">
+            <span>Confianza 0.827</span>
+            <span>Edge 538.000</span>
+            <span class="mono">mt5:XAUUSD</span>
+          </div>
+        </article>
+        
+        <article class="card">
+          <div class="card-top">
+            <div class="card-title">Setup largo</div>
             <div class="small">run #5467</div>
           </div>
           <div class="card-copy">El modelo ve al mercado cotizando por debajo de su estimacion justa. La confianza es 0.83 y el edge esperado es 480.000.</div>
@@ -355,32 +381,6 @@
           <div class="meta-line">
             <span>Confianza 0.859</span>
             <span>Edge 479.000</span>
-            <span class="mono">mt5:XAUUSD</span>
-          </div>
-        </article>
-        
-        <article class="card">
-          <div class="card-top">
-            <div class="card-title">Setup largo</div>
-            <div class="small">run #5464</div>
-          </div>
-          <div class="card-copy">El modelo ve al mercado cotizando por debajo de su estimacion justa. La confianza es 0.83 y el edge esperado es 483.000.</div>
-          <div class="meta-line">
-            <span>Confianza 0.827</span>
-            <span>Edge 483.000</span>
-            <span class="mono">mt5:XAUUSD</span>
-          </div>
-        </article>
-        
-        <article class="card">
-          <div class="card-top">
-            <div class="card-title">Setup largo</div>
-            <div class="small">run #5463</div>
-          </div>
-          <div class="card-copy">El modelo ve al mercado cotizando por debajo de su estimacion justa. La confianza es 0.83 y el edge esperado es 459.000.</div>
-          <div class="meta-line">
-            <span>Confianza 0.827</span>
-            <span>Edge 459.000</span>
             <span class="mono">mt5:XAUUSD</span>
           </div>
         </article>
@@ -463,15 +463,15 @@
     <div class="stack">
       <article class="card">
         <div class="card-top">
-          <div class="card-title">Corrida #5467</div>
+          <div class="card-title">Corrida #5472</div>
           <div class="small">mt5 / live</div>
         </div>
-        <div class="card-copy">Equidad inicial 60.42. Equidad final 60.53. Esta corrida termino arriba en la sesion.</div>
+        <div class="card-copy">Equidad inicial 62.51. Equidad final 62.37. Esta corrida termino abajo en la sesion.</div>
         <div class="meta-line">
           <span>Senales 1</span>
           <span>Fills 0</span>
           <span>Abiertas 1</span>
-          <span class="green">PnL 0.11</span>
+          <span class="red">PnL -0.14</span>
         </div>
       </article>
     </div>
@@ -487,43 +487,34 @@
         </div>
         <div class="run-table">
         <div class="run-row">
-          <div class="mono">#5467</div>
+          <div class="mono">#5472</div>
           <div>
             <div>mt5 / run-once-live</div>
             <div class="small">senales 1 | fills 0 | abiertas 1</div>
           </div>
-          <div class="green">0.11</div>
+          <div class="red">-0.14</div>
         </div>
         
         <div class="run-row">
-          <div class="mono">#5466</div>
+          <div class="mono">#5471</div>
           <div>
             <div>mt5 / run-once-live</div>
-            <div class="small">senales 0 | fills 0 | abiertas 1</div>
+            <div class="small">senales 0 | fills 0 | abiertas 0</div>
           </div>
           <div class="green">0.00</div>
         </div>
         
         <div class="run-row">
-          <div class="mono">#5465</div>
+          <div class="mono">#5470</div>
           <div>
             <div>mt5 / run-once-live</div>
-            <div class="small">senales 1 | fills 0 | abiertas 1</div>
+            <div class="small">senales 0 | fills 0 | abiertas 0</div>
           </div>
-          <div class="red">-0.04</div>
+          <div class="green">0.00</div>
         </div>
         
         <div class="run-row">
-          <div class="mono">#5464</div>
-          <div>
-            <div>mt5 / run-once-live</div>
-            <div class="small">senales 1 | fills 0 | abiertas 1</div>
-          </div>
-          <div class="red">-0.30</div>
-        </div>
-        
-        <div class="run-row">
-          <div class="mono">#5463</div>
+          <div class="mono">#5469</div>
           <div>
             <div>mt5 / run-once-live</div>
             <div class="small">senales 1 | fills 0 | abiertas 1</div>
@@ -532,12 +523,21 @@
         </div>
         
         <div class="run-row">
-          <div class="mono">#5462</div>
+          <div class="mono">#5468</div>
+          <div>
+            <div>mt5 / run-once-live</div>
+            <div class="small">senales 0 | fills 0 | abiertas 1</div>
+          </div>
+          <div class="green">0.00</div>
+        </div>
+        
+        <div class="run-row">
+          <div class="mono">#5467</div>
           <div>
             <div>mt5 / run-once-live</div>
             <div class="small">senales 1 | fills 0 | abiertas 1</div>
           </div>
-          <div class="green">0.00</div>
+          <div class="green">0.11</div>
         </div>
         </div>
       </section>
